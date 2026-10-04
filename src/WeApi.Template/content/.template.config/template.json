@@ -27,6 +27,38 @@
       "defaultValue": "sqlserver",
       "description": "The relational database provider to configure by default."
     },
+    "idType": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "guid",
+          "description": "GUID / UUID v7 identifier (recommended for distributed systems and clean separation)"
+        },
+        {
+          "choice": "int",
+          "description": "32-bit auto-incrementing integer identity"
+        },
+        {
+          "choice": "long",
+          "description": "64-bit auto-incrementing bigint identity (suitable for high scale)"
+        }
+      ],
+      "defaultValue": "guid",
+      "description": "The primary key identifier type to use for domain entities."
+    },
+    "useIntId": {
+      "type": "computed",
+      "value": "(idType == \"int\")"
+    },
+    "useLongId": {
+      "type": "computed",
+      "value": "(idType == \"long\")"
+    },
+    "useGuidId": {
+      "type": "computed",
+      "value": "(idType == \"guid\")"
+    },
     "dbProviderReplacement": {
       "type": "generated",
       "generator": "switch",

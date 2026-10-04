@@ -87,7 +87,13 @@ public class AuthenticationService(
         return new AuthResponse(token, expiresAt, userResponse);
     }
 
+#if useIntId
+    public async Task<UserResponse> GetCurrentUserAsync(int userId, CancellationToken cancellationToken = default)
+#elif useLongId
+    public async Task<UserResponse> GetCurrentUserAsync(long userId, CancellationToken cancellationToken = default)
+#else
     public async Task<UserResponse> GetCurrentUserAsync(Guid userId, CancellationToken cancellationToken = default)
+#endif
     {
         var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
         if (user is null)

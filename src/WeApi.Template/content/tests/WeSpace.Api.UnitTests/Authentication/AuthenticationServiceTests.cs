@@ -147,16 +147,31 @@ public class AuthenticationServiceTests
     public async Task GetCurrentUserAsync_WhenUserNotFound_ShouldThrowNotFoundException()
     {
         // Act & Assert
+#if useIntId
+        await Assert.ThrowsAsync<NotFoundException>(() => _service.GetCurrentUserAsync(999));
+#elif useLongId
+        await Assert.ThrowsAsync<NotFoundException>(() => _service.GetCurrentUserAsync(999L));
+#else
         await Assert.ThrowsAsync<NotFoundException>(() => _service.GetCurrentUserAsync(Guid.NewGuid()));
+#endif
     }
 
     // In-memory test test doubles
     private sealed class InMemoryUserRepository : IUserRepository
     {
         private readonly List<User> _users = [];
-
+#if useIntId
+        private int _currentId;
+        public Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
+            Task.FromResult(_users.FirstOrDefault(u => u.Id == id));
+#elif useLongId
+        private long _currentId;
+        public Task<User?> GetByIdAsync(long id, CancellationToken cancellationToken = default) =>
+            Task.FromResult(_users.FirstOrDefault(u => u.Id == id));
+#else
         public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
             Task.FromResult(_users.FirstOrDefault(u => u.Id == id));
+#endif
 
         public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default) =>
             Task.FromResult(_users.FirstOrDefault(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase)));
@@ -166,6 +181,17 @@ public class AuthenticationServiceTests
 
         public Task AddAsync(User user, CancellationToken cancellationToken = default)
         {
+#if useIntId
+            if (user.Id == 0)
+            {
+                user.Id = ++_currentId;
+            }
+#elif useLongId
+            if (user.Id == 0)
+            {
+                user.Id = ++_currentId;
+            }
+#endif
             _users.Add(user);
             return Task.CompletedTask;
         }

@@ -60,6 +60,16 @@ public class CliTests
     }
 
     [Fact]
+    public async Task Main_WithUnsupportedIdType_ShouldReturnOne()
+    {
+        // Act
+        var exitCode = await Program.Main(["new", "ValidName", "--id-type", "custom"]);
+
+        // Assert
+        Assert.Equal(1, exitCode);
+    }
+
+    [Fact]
     public async Task Main_WithDryRun_ShouldReturnZero()
     {
         // Act
@@ -136,6 +146,96 @@ public class CliTests
             var appsettingsContent = await File.ReadAllTextAsync(appsettingsPath);
             Assert.Contains("\"Provider\": \"PostgreSql\"", appsettingsContent);
             Assert.Contains(projectName, appsettingsContent);
+        }
+        finally
+        {
+            if (Directory.Exists(baseDir))
+            {
+                Directory.Delete(baseDir, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Main_WithIntIdType_ShouldGenerateValidProjectWithIntIds()
+    {
+        // Arrange
+        var projectName = "TestGenInt.Api";
+        var baseDir = Path.Combine(Path.GetTempPath(), $"weapi_gen_{Guid.NewGuid()}");
+        var targetDir = Path.Combine(baseDir, projectName);
+
+        try
+        {
+            // Act
+            var exitCode = await Program.Main([
+                "new",
+                projectName,
+                "-o",
+                targetDir,
+                "--id-type",
+                "int"
+            ]);
+
+            // Assert
+            Assert.Equal(0, exitCode);
+            Assert.True(Directory.Exists(targetDir));
+
+            // Verify BaseEntity uses int Id
+            var baseEntityFile = Path.Combine(targetDir, "src", $"{projectName}.Domain", "Common", "BaseEntity.cs");
+            Assert.True(File.Exists(baseEntityFile));
+            var baseEntityContent = await File.ReadAllTextAsync(baseEntityFile);
+            Assert.Contains("public int Id", baseEntityContent);
+
+            // Verify UserResponse uses int Id
+            var userResponseFile = Path.Combine(targetDir, "src", $"{projectName}.Application", "DTOs", "Auth", "UserResponse.cs");
+            Assert.True(File.Exists(userResponseFile));
+            var userResponseContent = await File.ReadAllTextAsync(userResponseFile);
+            Assert.Contains("int Id,", userResponseContent);
+        }
+        finally
+        {
+            if (Directory.Exists(baseDir))
+            {
+                Directory.Delete(baseDir, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task Main_WithLongIdType_ShouldGenerateValidProjectWithLongIds()
+    {
+        // Arrange
+        var projectName = "TestGenLong.Api";
+        var baseDir = Path.Combine(Path.GetTempPath(), $"weapi_gen_{Guid.NewGuid()}");
+        var targetDir = Path.Combine(baseDir, projectName);
+
+        try
+        {
+            // Act
+            var exitCode = await Program.Main([
+                "new",
+                projectName,
+                "-o",
+                targetDir,
+                "--id-type",
+                "long"
+            ]);
+
+            // Assert
+            Assert.Equal(0, exitCode);
+            Assert.True(Directory.Exists(targetDir));
+
+            // Verify BaseEntity uses long Id
+            var baseEntityFile = Path.Combine(targetDir, "src", $"{projectName}.Domain", "Common", "BaseEntity.cs");
+            Assert.True(File.Exists(baseEntityFile));
+            var baseEntityContent = await File.ReadAllTextAsync(baseEntityFile);
+            Assert.Contains("public long Id", baseEntityContent);
+
+            // Verify UserResponse uses long Id
+            var userResponseFile = Path.Combine(targetDir, "src", $"{projectName}.Application", "DTOs", "Auth", "UserResponse.cs");
+            Assert.True(File.Exists(userResponseFile));
+            var userResponseContent = await File.ReadAllTextAsync(userResponseFile);
+            Assert.Contains("long Id,", userResponseContent);
         }
         finally
         {

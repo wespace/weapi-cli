@@ -7,6 +7,7 @@ public record ProjectGenerationOptions(
     string ProjectName,
     string? OutputDirectory,
     string Database = "sqlserver",
+    string IdType = "guid",
     bool DryRun = false);
 
 public static class ProjectGenerator
@@ -19,6 +20,13 @@ public static class ProjectGenerator
     {
         "sqlserver",
         "postgresql"
+    };
+
+    private static readonly HashSet<string> SupportedIdTypes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "guid",
+        "int",
+        "long"
     };
 
     public static async Task<int> GenerateAsync(
@@ -48,12 +56,21 @@ public static class ProjectGenerator
             return 1;
         }
 
-        // 3. Resolve target directory
+        // 3. Validate entity ID type option
+        var idType = options.IdType.ToLowerInvariant();
+        if (!SupportedIdTypes.Contains(idType))
+        {
+            ConsoleUi.WriteError(
+                $"Unsupported entity ID type '{options.IdType}'. Supported options are: 'guid', 'int', 'long'.");
+            return 1;
+        }
+
+        // 4. Resolve target directory
         var targetDirectory = string.IsNullOrWhiteSpace(options.OutputDirectory)
             ? Path.Combine(Directory.GetCurrentDirectory(), options.ProjectName)
             : Path.GetFullPath(options.OutputDirectory);
 
-        // 4. Validate target directory is empty if exists
+        // 5. Validate target directory is empty if exists
         if (Directory.Exists(targetDirectory) && Directory.EnumerateFileSystemEntries(targetDirectory).Any())
         {
             ConsoleUi.WriteError(
@@ -63,7 +80,7 @@ public static class ProjectGenerator
 
         if (options.DryRun)
         {
-            ConsoleUi.WriteInfo($"[Dry Run] Would generate '{options.ProjectName}' in '{targetDirectory}' with '{database}' database.");
+            ConsoleUi.WriteInfo($"[Dry Run] Would generate '{options.ProjectName}' in '{targetDirectory}' with '{database}' database and '{idType}' primary key ID type.");
             return 0;
         }
 
@@ -71,15 +88,15 @@ public static class ProjectGenerator
         ConsoleUi.WriteInfo($"Creating {options.ProjectName}...");
         Console.WriteLine();
 
-        // 5. Ensure template is installed
+        // 6. Ensure template is installed
         var templateInstalled = await TemplateManager.EnsureTemplateInstalledAsync(force: false, cancellationToken);
         if (!templateInstalled)
         {
             return 1;
         }
 
-        // 6. Invoke dotnet new
-        var arguments = $"new we-api -n \"{options.ProjectName}\" -o \"{targetDirectory}\" --database {database}";
+        // 7. Invoke dotnet new
+        var arguments = $"new we-api -n \"{options.ProjectName}\" -o \"{targetDirectory}\" --database {database} --idType {idType}";
         var result = await ProcessRunner.RunAsync("dotnet", arguments, null, cancellationToken);
 
         if (!result.Success)
@@ -88,7 +105,7 @@ public static class ProjectGenerator
             return 1;
         }
 
-        // 7. Report success with clear visual steps
+        // 8. Report success with clear visual steps
         ConsoleUi.WriteStep("Solution created");
         ConsoleUi.WriteStep("API project created");
         ConsoleUi.WriteStep("Application project created");
@@ -98,6 +115,7 @@ public static class ProjectGenerator
         ConsoleUi.WriteStep("Integration tests created");
         ConsoleUi.WriteStep("JWT authentication configured");
         ConsoleUi.WriteStep($"Database configured ({database.ToUpperInvariant()})");
+        ConsoleUi.WriteStep($"Entity ID type configured ({idType.ToUpperInvariant()})");
         ConsoleUi.WriteStep("Swagger OpenAPI configured");
 
         ConsoleUi.WriteSuccess("Project created successfully.");

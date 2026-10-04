@@ -10,6 +10,7 @@ Distributed as both a **.NET Global Tool (`WeApi.Cli`)** and an official **`dotn
 
 - **Modern .NET 10 & C# 13**: File-scoped namespaces, primary constructors, collection expressions, nullable reference types, and async I/O with `CancellationToken`.
 - **Practical Clean Architecture**: Strict separation of concerns (API → Application → Domain ← Infrastructure) without over-engineering (no MediatR, CQRS, or generic repository overhead).
+- **Configurable Primary Key IDs**: Scaffolds with sortable **GUID (UUID v7)**, 32-bit **integer (`int`)**, or 64-bit bigint (**`long`**) primary keys across entities, repositories, and auth DTOs.
 - **Dual Database Provider Support**: First-class support for both **Microsoft SQL Server** and **PostgreSQL (Npgsql)** with isolated provider configuration and health checks.
 - **Production Authentication**:
   - Secure registration (`POST /api/auth/register`) with input and password complexity validation.
@@ -175,29 +176,46 @@ dotnet new list we-api
 
 ### Using the CLI (`weapi`)
 
-#### 1. SQL Server Backend (Default)
+#### 1. SQL Server Backend with GUID IDs (Default)
 ```bash
 weapi new WeSpace.OrderingService
 ```
 
-#### 2. PostgreSQL Backend
+#### 2. PostgreSQL Backend with Integer IDs
 ```bash
-weapi new WeSpace.OrderingService --database postgresql
+weapi new WeSpace.OrderingService --database postgresql --id-type int
 ```
 
-#### 3. Custom Output Directory
+#### 3. 64-bit Long (BigInt) IDs for High Scale
 ```bash
-weapi new WeSpace.OrderingService -o ./services/ordering-service --database postgresql
+weapi new WeSpace.OrderingService --id-type long
 ```
+
+#### 4. Custom Output Directory
+```bash
+weapi new WeSpace.OrderingService -o ./services/ordering-service --database postgresql --id-type int
+```
+
+### CLI Arguments & Flags
+
+| Flag | Short | Description | Values | Default |
+|------|-------|-------------|--------|---------|
+| `--database` | `-d` | Relational database provider | `sqlserver`, `postgresql` | `sqlserver` |
+| `--id-type` | `-i`, `--id` | Entity primary key identifier type | `guid`, `int`, `long` | `guid` |
+| `--output` | `-o` | Output directory | Directory path | `./<ProjectName>` |
+| `--dry-run` | | Preview generation without writing files | | |
 
 ### Using `dotnet new`
 
 ```bash
-# SQL Server
-dotnet new we-api -n WeSpace.OrderingService --database sqlserver
+# SQL Server with GUID IDs (default)
+dotnet new we-api -n WeSpace.OrderingService
 
-# PostgreSQL
-dotnet new we-api -n WeSpace.OrderingService --database postgresql
+# PostgreSQL with 32-bit integer IDs
+dotnet new we-api -n WeSpace.OrderingService --database postgresql --idType int
+
+# SQL Server with 64-bit long (bigint) IDs
+dotnet new we-api -n WeSpace.OrderingService --database sqlserver --idType long
 ```
 
 ---

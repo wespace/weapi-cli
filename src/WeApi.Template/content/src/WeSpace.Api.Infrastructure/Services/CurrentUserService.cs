@@ -8,6 +8,31 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
+#if useIntId
+    public int? UserId
+    {
+        get
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var subClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                           ?? user?.FindFirst("sub")?.Value;
+
+            return int.TryParse(subClaim, out var id) ? id : null;
+        }
+    }
+#elif useLongId
+    public long? UserId
+    {
+        get
+        {
+            var user = _httpContextAccessor.HttpContext?.User;
+            var subClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                           ?? user?.FindFirst("sub")?.Value;
+
+            return long.TryParse(subClaim, out var id) ? id : null;
+        }
+    }
+#else
     public Guid? UserId
     {
         get
@@ -19,6 +44,7 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
             return Guid.TryParse(subClaim, out var id) ? id : null;
         }
     }
+#endif
 
     public string? Email =>
         _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;

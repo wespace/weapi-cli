@@ -11,6 +11,16 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.ToTable("Users");
 
         builder.HasKey(u => u.Id);
+#if useIntId
+        builder.Property(u => u.Id)
+            .ValueGeneratedOnAdd();
+#elif useLongId
+        builder.Property(u => u.Id)
+            .ValueGeneratedOnAdd();
+#else
+        builder.Property(u => u.Id)
+            .ValueGeneratedNever();
+#endif
 
         builder.Property(u => u.FirstName)
             .IsRequired()

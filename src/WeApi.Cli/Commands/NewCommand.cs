@@ -10,6 +10,7 @@ public static class NewCommand
         string? projectName = null;
         string? outputDirectory = null;
         string database = "sqlserver";
+        string idType = "guid";
         bool dryRun = false;
 
         for (int i = 0; i < args.Length; i++)
@@ -25,6 +26,18 @@ public static class NewCommand
                 else
                 {
                     ConsoleUi.WriteError("Missing value for option --database. Allowed values: sqlserver, postgresql");
+                    return 1;
+                }
+            }
+            else if (arg.Equals("--id-type", StringComparison.OrdinalIgnoreCase) || arg.Equals("--id", StringComparison.OrdinalIgnoreCase) || arg.Equals("-i", StringComparison.OrdinalIgnoreCase))
+            {
+                if (i + 1 < args.Length)
+                {
+                    idType = args[++i];
+                }
+                else
+                {
+                    ConsoleUi.WriteError("Missing value for option --id-type. Allowed values: guid, int, long");
                     return 1;
                 }
             }
@@ -62,7 +75,7 @@ public static class NewCommand
 
         if (string.IsNullOrWhiteSpace(projectName))
         {
-            ConsoleUi.WriteError("Project name is required.\nUsage: weapi new <ProjectName> [--database sqlserver|postgresql]");
+            ConsoleUi.WriteError("Project name is required.\nUsage: weapi new <ProjectName> [--database sqlserver|postgresql] [--id-type guid|int|long]");
             return 1;
         }
 
@@ -70,6 +83,7 @@ public static class NewCommand
             ProjectName: projectName,
             OutputDirectory: outputDirectory,
             Database: database,
+            IdType: idType,
             DryRun: dryRun);
 
         return await ProjectGenerator.GenerateAsync(options, cancellationToken);

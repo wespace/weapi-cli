@@ -8,7 +8,13 @@ public class UserRepository(ApplicationDbContext dbContext) : IUserRepository
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
 
+#if useIntId
+    public async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+#elif useLongId
+    public async Task<User?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+#else
     public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+#endif
     {
         return await _dbContext.Users
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
