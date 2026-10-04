@@ -58,7 +58,7 @@ jobs:
       - name: Install Template Locally
         shell: bash
         run: |
-          dotnet new install artifacts/WeApi.Template.*.nupkg
+          dotnet new install artifacts/WeApi.Template.*.nupkg --force
 
       - name: Test Project Generation via dotnet new (SQL Server)
         shell: bash
@@ -73,7 +73,7 @@ jobs:
         shell: bash
         run: |
           export PATH="$PATH:$HOME/.dotnet/tools"
-          dotnet tool install --global --add-source ./artifacts WeApi.Cli
+          dotnet tool install --global --add-source ./artifacts WeApi.Cli || dotnet tool update --global --add-source ./artifacts WeApi.Cli
           weapi new DemoCompany.PgApi -o ./test-output-pg --database postgresql --id-type int
           cd test-output-pg
           dotnet restore DemoCompany.PgApi.slnx
