@@ -52,6 +52,9 @@ public static class TemplateManager
             }
         }
 
+        // Ensure no conflicting duplicate package paths exist before installing
+        await ProcessRunner.RunAsync("dotnet", "new uninstall WeApi.Template", null, cancellationToken);
+
         // Install into dotnet new
         var installResult = await ProcessRunner.RunAsync(
             "dotnet",

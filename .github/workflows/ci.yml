@@ -58,7 +58,8 @@ jobs:
       - name: Install Template Locally
         shell: bash
         run: |
-          dotnet new install artifacts/WeApi.Template.*.nupkg --force
+          dotnet new uninstall WeApi.Template || true
+          dotnet new install artifacts/WeApi.Template.*.nupkg
 
       - name: Test Project Generation via dotnet new (SQL Server)
         shell: bash
