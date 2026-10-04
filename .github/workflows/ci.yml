@@ -28,9 +28,6 @@ jobs:
       - name: Display .NET SDK info
         run: dotnet --info
 
-      - name: Verify Code Formatting
-        run: dotnet format --no-restore --verify-no-changes
-
       - name: Pack Template Package
         run: dotnet pack src/WeApi.Template/WeApi.Template.csproj -c Release -o artifacts/
 
@@ -42,6 +39,9 @@ jobs:
 
       - name: Restore Root Solution
         run: dotnet restore WeApi.slnx
+
+      - name: Verify Code Formatting
+        run: dotnet format WeApi.slnx --no-restore --verify-no-changes
 
       - name: Build Root Solution
         run: dotnet build WeApi.slnx -c Release --no-restore
@@ -69,11 +69,12 @@ jobs:
           dotnet build DemoCompany.SqlApi.slnx --no-restore
           dotnet test DemoCompany.SqlApi.slnx --no-build
 
-      - name: Test Project Generation via CLI Tool (PostgreSQL)
+      - name: Test Project Generation via CLI Tool (PostgreSQL & int ID)
         shell: bash
         run: |
+          export PATH="$PATH:$HOME/.dotnet/tools"
           dotnet tool install --global --add-source ./artifacts WeApi.Cli
-          weapi new DemoCompany.PgApi -o ./test-output-pg --database postgresql
+          weapi new DemoCompany.PgApi -o ./test-output-pg --database postgresql --id-type int
           cd test-output-pg
           dotnet restore DemoCompany.PgApi.slnx
           dotnet build DemoCompany.PgApi.slnx --no-restore
