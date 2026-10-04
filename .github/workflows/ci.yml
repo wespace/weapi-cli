@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Display .NET SDK info
+        run: dotnet --info
+
+      - name: Verify Code Formatting
+        run: dotnet format --verify-no-changes
+
+      - name: Pack Template Package
+        run: dotnet pack src/MyCleanApi.Template/MyCleanApi.Template.csproj -c Release -o artifacts/
+
+      - name: Copy Packed Template into CLI Resources
+        shell: bash
+        run: |
+          mkdir -p src/MyCleanApi.Cli/Resources
+          cp artifacts/MyCleanApi.Template.*.nupkg src/MyCleanApi.Cli/Resources/MyCleanApi.Template.1.0.0.nupkg
+
+      - name: Restore Root Solution
+        run: dotnet restore MyCleanApi.slnx
+
+      - name: Build Root Solution
+        run: dotnet build MyCleanApi.slnx -c Release --no-restore
+
+      - name: Run CLI Tests
+        run: dotnet test tests/MyCleanApi.Cli.Tests/MyCleanApi.Cli.Tests.csproj -c Release --no-build --verbosity normal
+
+      - name: Pack CLI Global Tool
+        run: dotnet pack src/MyCleanApi.Cli/MyCleanApi.Cli.csproj -c Release -o artifacts/
+
+      - name: Test Template Solution Directly
+        run: dotnet test src/MyCleanApi.Template/content/MyCompany.MyApi.slnx -c Release --verbosity normal
+
+      - name: Install Template Locally
+        shell: bash
+        run: |
+          dotnet new install artifacts/MyCleanApi.Template.*.nupkg
+
+      - name: Test Project Generation via dotnet new (SQL Server)
+        shell: bash
+        run: |
+          dotnet new my-clean-api -n DemoCompany.SqlApi -o ./test-output-sql --database sqlserver
+          cd test-output-sql
+          dotnet restore DemoCompany.SqlApi.slnx
+          dotnet build DemoCompany.SqlApi.slnx --no-restore
+          dotnet test DemoCompany.SqlApi.slnx --no-build
+
+      - name: Test Project Generation via CLI Tool (PostgreSQL)
+        shell: bash
+        run: |
+          dotnet tool install --global --add-source ./artifacts MyCleanApi.Cli
+          mycleanapi new DemoCompany.PgApi -o ./test-output-pg --database postgresql
+          cd test-output-pg
+          dotnet restore DemoCompany.PgApi.slnx
+          dotnet build DemoCompany.PgApi.slnx --no-restore
+          dotnet test DemoCompany.PgApi.slnx --no-build
+
+      - name: Upload Build Artifacts
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: artifacts/*.nupkg
+          if-no-files-found: error

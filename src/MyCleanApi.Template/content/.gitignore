@@ -1,0 +1,29 @@
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## IDEs
+.vs/
+*.user
+*.suo
+.idea/
+.vscode/
+!.vscode/settings.json
+
+## Test results
+[Tt]est[Rr]esult*/
+
+## Local secrets
+appsettings.*.local.json
+secrets.json
+
+## OS
+.DS_Store
+Thumbs.db
