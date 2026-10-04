@@ -1,0 +1,20 @@
+# Auto-detect text files and normalize line endings to LF
+* text=auto eol=lf
+
+# Source and configuration files
+*.cs text eol=lf
+*.csproj text eol=lf
+*.slnx text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.editorconfig text eol=lf
+*.props text eol=lf
+
+# Binaries
+*.nupkg binary
+*.dll binary
+*.pdb binary
+*.png binary
+*.ico binary
