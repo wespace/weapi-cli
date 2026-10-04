@@ -9,6 +9,9 @@ jobs:
   publish:
     name: Build, Pack & Publish to NuGet
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,11 +42,19 @@ jobs:
       - name: Pack CLI Global Tool
         run: dotnet pack src/WeApi.Cli/WeApi.Cli.csproj -c Release -o artifacts/
 
+      # Authenticate via NuGet Trusted Publisher (OIDC)
+      - name: NuGet Login via OIDC
+        uses: NuGet/login@v1
+        id: login
+        continue-on-error: true
+        with:
+          user: wespace
+
       - name: Push to NuGet.org
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          RESOLVED_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY || secrets.NUGET_API_KEY }}
         run: |
           dotnet nuget push "artifacts/*.nupkg" \
-            --api-key "${NUGET_API_KEY}" \
+            --api-key "${RESOLVED_API_KEY}" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
