@@ -4,14 +4,14 @@
     <PackageType>Template</PackageType>
     <PackageId>WeApi.Template</PackageId>
     <Title>Clean Architecture .NET 10 Web API Template</Title>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>WeApi Contributors</Authors>
     <Company>WeApi</Company>
     <Product>WeApi</Product>
     <Description>Production-ready Clean Architecture .NET 10 Web API template with JWT authentication, EF Core (SQL Server / PostgreSQL), FluentValidation, Serilog, and OpenAPI.</Description>
     <PackageTags>dotnet-new;templates;clean-architecture;webapi;dotnet10;jwt;efcore;csharp;postgresql;sqlserver</PackageTags>
-    <PackageProjectUrl>https://github.com/weapi/dotnet-clean-api</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/weapi/dotnet-clean-api</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/wespace/weapi-cli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/wespace/weapi-cli</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <TargetFramework>net10.0</TargetFramework>

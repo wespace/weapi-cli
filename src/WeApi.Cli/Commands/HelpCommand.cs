@@ -41,7 +41,7 @@ EXAMPLES:
   weapi new InventoryApi -o ./services/inventory-api
 
 For more documentation, visit:
-https://github.com/weapi/dotnet-clean-api
+https://github.com/wespace/weapi-cli
 ");
     }
 }

@@ -11,21 +11,21 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>weapi</ToolCommandName>
     <PackageId>WeApi.Cli</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>WeApi Contributors</Authors>
     <Company>WeApi</Company>
     <Product>WeApi CLI</Product>
     <Description>Production-ready cross-platform CLI tool to generate Clean Architecture .NET 10 Web API backends.</Description>
     <PackageTags>dotnet-tool;clean-architecture;webapi;dotnet10;cli;scaffold;template</PackageTags>
-    <PackageProjectUrl>https://github.com/weapi/dotnet-clean-api</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/weapi/dotnet-clean-api</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/wespace/weapi-cli</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/wespace/weapi-cli</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    <EmbeddedResource Include="Resources\WeApi.Template.1.0.0.nupkg">
+    <EmbeddedResource Include="Resources\WeApi.Template.*.nupkg">
       <LogicalName>WeApi.Template.nupkg</LogicalName>
     </EmbeddedResource>
   </ItemGroup>

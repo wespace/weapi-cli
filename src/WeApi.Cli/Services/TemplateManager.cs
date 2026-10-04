@@ -26,7 +26,7 @@ public static class TemplateManager
         // Extract embedded template package
         var tempDirectory = Path.Combine(Path.GetTempPath(), "weapi-template");
         Directory.CreateDirectory(tempDirectory);
-        var tempPackagePath = Path.Combine(tempDirectory, "WeApi.Template.1.0.0.nupkg");
+        var tempPackagePath = Path.Combine(tempDirectory, "WeApi.Template.nupkg");
 
         var assembly = Assembly.GetExecutingAssembly();
         await using (var resourceStream = assembly.GetManifestResourceStream(ResourceName))
@@ -34,8 +34,12 @@ public static class TemplateManager
             if (resourceStream is null)
             {
                 // Fallback: search in adjacent directories if running from development build
-                var devPath = Path.Combine(AppContext.BaseDirectory, "Resources", "WeApi.Template.1.0.0.nupkg");
-                if (File.Exists(devPath))
+                var resourcesDir = Path.Combine(AppContext.BaseDirectory, "Resources");
+                var devPath = Directory.Exists(resourcesDir)
+                    ? Directory.GetFiles(resourcesDir, "WeApi.Template*.nupkg").FirstOrDefault()
+                    : null;
+
+                if (devPath is not null && File.Exists(devPath))
                 {
                     File.Copy(devPath, tempPackagePath, overwrite: true);
                 }
