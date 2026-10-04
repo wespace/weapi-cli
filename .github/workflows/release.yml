@@ -1,0 +1,49 @@
+name: Publish to NuGet
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Build, Pack & Publish to NuGet
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore Root Solution
+        run: dotnet restore WeApi.slnx
+
+      - name: Run CLI Tests
+        run: dotnet test tests/WeApi.Cli.Tests/WeApi.Cli.Tests.csproj -c Release
+
+      - name: Run Template Tests
+        run: dotnet test src/WeApi.Template/content/WeSpace.Api.slnx -c Release
+
+      - name: Pack Template Package
+        run: dotnet pack src/WeApi.Template/WeApi.Template.csproj -c Release -o artifacts/
+
+      - name: Bundle Template into CLI Resources
+        shell: bash
+        run: |
+          mkdir -p src/WeApi.Cli/Resources
+          cp artifacts/WeApi.Template.*.nupkg src/WeApi.Cli/Resources/WeApi.Template.1.0.0.nupkg
+
+      - name: Pack CLI Global Tool
+        run: dotnet pack src/WeApi.Cli/WeApi.Cli.csproj -c Release -o artifacts/
+
+      - name: Push to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --api-key "${NUGET_API_KEY}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate

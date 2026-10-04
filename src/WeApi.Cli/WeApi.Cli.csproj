@@ -20,9 +20,11 @@
     <PackageProjectUrl>https://github.com/weapi/dotnet-clean-api</PackageProjectUrl>
     <RepositoryUrl>https://github.com/weapi/dotnet-clean-api</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <EmbeddedResource Include="Resources\WeApi.Template.1.0.0.nupkg">
       <LogicalName>WeApi.Template.nupkg</LogicalName>
     </EmbeddedResource>
