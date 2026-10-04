@@ -40,8 +40,14 @@ jobs:
       - name: Restore Root Solution
         run: dotnet restore WeApi.slnx
 
-      - name: Verify Code Formatting
-        run: dotnet format WeApi.slnx --no-restore --verify-no-changes
+      - name: Verify Code Style & Formatting
+        run: |
+          dotnet format style WeApi.slnx --no-restore --verify-no-changes
+          dotnet format analyzers WeApi.slnx --no-restore --verify-no-changes
+
+      - name: Verify Whitespace & Line Endings (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: dotnet format whitespace WeApi.slnx --no-restore --verify-no-changes
 
       - name: Build Root Solution
         run: dotnet build WeApi.slnx -c Release --no-restore
