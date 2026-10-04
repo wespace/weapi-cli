@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WeSpace.Api.API/WeSpace.Api.API.csproj" />
+    <Project Path="src/WeSpace.Api.Application/WeSpace.Api.Application.csproj" />
+    <Project Path="src/WeSpace.Api.Domain/WeSpace.Api.Domain.csproj" />
+    <Project Path="src/WeSpace.Api.Infrastructure/WeSpace.Api.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WeSpace.Api.IntegrationTests/WeSpace.Api.IntegrationTests.csproj" />
+    <Project Path="tests/WeSpace.Api.UnitTests/WeSpace.Api.UnitTests.csproj" />
+  </Folder>
+</Solution>

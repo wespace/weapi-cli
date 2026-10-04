@@ -1,8 +1,8 @@
-# MyCleanApi — Production-Ready Clean Architecture .NET 10 Starter
+# WeApi — Production-Ready Clean Architecture .NET 10 Starter
 
 A robust, enterprise-grade, and reusable **.NET 10 Web API starter platform** and **cross-platform CLI tool** built on practical **Clean Architecture**, EF Core 10, JWT Bearer authentication, and modern C# 13/.NET 10 conventions.
 
-Distributed as both a **.NET Global Tool (`MyCleanApi.Cli`)** and an official **`dotnet new` template (`MyCleanApi.Template`)**.
+Distributed as both a **.NET Global Tool (`WeApi.Cli`)** and an official **`dotnet new` template (`WeApi.Template`)**.
 
 ---
 
@@ -36,33 +36,33 @@ init-templates/
 ├── Directory.Build.props          # Global compiler flags & metadata
 ├── Directory.Packages.props       # Central Package Management (CPM)
 ├── global.json                    # Pin to .NET 10 SDK
-├── MyCleanApi.slnx                # Root solution
+├── WeApi.slnx                # Root solution
 ├── README.md                      # Platform documentation
 │
 ├── src/
-│   ├── MyCleanApi.Cli/            # Cross-platform CLI Global Tool
+│   ├── WeApi.Cli/            # Cross-platform CLI Global Tool
 │   │   ├── Commands/              # New, Help, Version commands
 │   │   ├── Common/                # Console UI, Process runner
 │   │   ├── Services/              # Project generator & template installer
 │   │   ├── Resources/             # Bundled template nupkg
 │   │   └── Program.cs
 │   │
-│   └── MyCleanApi.Template/       # NuGet template package
-│       ├── MyCleanApi.Template.csproj
+│   └── WeApi.Template/       # NuGet template package
+│       ├── WeApi.Template.csproj
 │       └── content/               # Clean Architecture Starter Solution
 │           ├── .template.config/
 │           │   └── template.json  # Template engine definition
-│           ├── MyCompany.MyApi.slnx
+│           ├── WeSpace.Api.slnx
 │           ├── Directory.Build.props
 │           ├── Directory.Packages.props
 │           │
 │           ├── src/
-│           │   ├── MyCompany.MyApi.Domain/
+│           │   ├── WeSpace.Api.Domain/
 │           │   │   ├── Common/    # BaseEntity, IAuditableEntity
 │           │   │   ├── Entities/  # User entity
 │           │   │   └── Enums/     # UserRole
 │           │   │
-│           │   ├── MyCompany.MyApi.Application/
+│           │   ├── WeSpace.Api.Application/
 │           │   │   ├── Common/    # Custom exceptions (NotFound, Conflict, etc.)
 │           │   │   ├── DTOs/      # RegisterRequest, LoginRequest, AuthResponse
 │           │   │   ├── Interfaces/# IUserRepository, IPasswordHasher, IJwtTokenGenerator
@@ -70,13 +70,13 @@ init-templates/
 │           │   │   ├── Validators/# FluentValidation rules
 │           │   │   └── DependencyInjection.cs
 │           │   │
-│           │   ├── MyCompany.MyApi.Infrastructure/
+│           │   ├── WeSpace.Api.Infrastructure/
 │           │   │   ├── Authentication/  # PBKDF2 hasher, JWT token generator
 │           │   │   ├── Persistence/     # ApplicationDbContext, Repositories, Providers
 │           │   │   ├── Services/        # CurrentUserService
 │           │   │   └── DependencyInjection.cs
 │           │   │
-│           │   └── MyCompany.MyApi.API/
+│           │   └── WeSpace.Api.API/
 │           │       ├── Controllers/     # AuthController, BaseApiController
 │           │       ├── Middleware/      # GlobalExceptionHandler (Problem Details)
 │           │       ├── Extensions/      # Swagger, CORS, Health checks
@@ -84,11 +84,11 @@ init-templates/
 │           │       └── Program.cs
 │           │
 │           └── tests/
-│               ├── MyCompany.MyApi.UnitTests/
-│               └── MyCompany.MyApi.IntegrationTests/
+│               ├── WeSpace.Api.UnitTests/
+│               └── WeSpace.Api.IntegrationTests/
 │
 └── tests/
-    └── MyCleanApi.Cli.Tests/      # CLI unit and end-to-end generation tests
+    └── WeApi.Cli.Tests/      # CLI unit and end-to-end generation tests
 ```
 
 ---
@@ -96,11 +96,11 @@ init-templates/
 ## Architectural Principles & Decisions
 
 ### 1. Unified Architecture: CLI + Template
-Rather than having two distinct generators with diverged logic, the repository uses **`dotnet new` as the template engine** and wraps it in **`MyCleanApi.Cli`**:
-- `MyCleanApi.Template` contains the solution files and `.template.config/template.json`.
-- `MyCleanApi.Cli` embeds the template package `.nupkg` directly in its assembly.
-- When `mycleanapi new` is run, the CLI ensures the template is installed in `dotnet new` (offline, without internet), invokes `dotnet new`, verifies all generated artifacts, and presents a rich terminal UI with progress steps and next instructions.
-- Developers who prefer standard .NET SDK commands can use `dotnet new my-clean-api` directly.
+Rather than having two distinct generators with diverged logic, the repository uses **`dotnet new` as the template engine** and wraps it in **`WeApi.Cli`**:
+- `WeApi.Template` contains the solution files and `.template.config/template.json`.
+- `WeApi.Cli` embeds the template package `.nupkg` directly in its assembly.
+- When `weapi new` is run, the CLI ensures the template is installed in `dotnet new` (offline, without internet), invokes `dotnet new`, verifies all generated artifacts, and presents a rich terminal UI with progress steps and next instructions.
+- Developers who prefer standard .NET SDK commands can use `dotnet new we-api` directly.
 
 ### 2. Pragmatic Clean Architecture
 Many Clean Architecture templates add unnecessary ceremony (MediatR commands/queries/handlers, event buses, unit of work wrappers over EF Core, generic repository abstractions).
@@ -149,55 +149,55 @@ During project scaffolding, the chosen provider is configured in `appsettings.js
 ### Option A: Install Global CLI Tool (Recommended)
 
 ```bash
-dotnet tool install --global MyCleanApi.Cli
+dotnet tool install --global WeApi.Cli
 ```
 
 Verify installation:
 ```bash
-mycleanapi --version
-mycleanapi --help
+weapi --version
+weapi --help
 ```
 
 ### Option B: Install `dotnet new` Template Directly
 
 ```bash
-dotnet new install MyCleanApi.Template
+dotnet new install WeApi.Template
 ```
 
 Verify installed templates:
 ```bash
-dotnet new list my-clean-api
+dotnet new list we-api
 ```
 
 ---
 
 ## Creating a New Project
 
-### Using the CLI (`mycleanapi`)
+### Using the CLI (`weapi`)
 
 #### 1. SQL Server Backend (Default)
 ```bash
-mycleanapi new MyCompany.OrderingService
+weapi new WeSpace.OrderingService
 ```
 
 #### 2. PostgreSQL Backend
 ```bash
-mycleanapi new MyCompany.OrderingService --database postgresql
+weapi new WeSpace.OrderingService --database postgresql
 ```
 
 #### 3. Custom Output Directory
 ```bash
-mycleanapi new MyCompany.OrderingService -o ./services/ordering-service --database postgresql
+weapi new WeSpace.OrderingService -o ./services/ordering-service --database postgresql
 ```
 
 ### Using `dotnet new`
 
 ```bash
 # SQL Server
-dotnet new my-clean-api -n MyCompany.OrderingService --database sqlserver
+dotnet new we-api -n WeSpace.OrderingService --database sqlserver
 
 # PostgreSQL
-dotnet new my-clean-api -n MyCompany.OrderingService --database postgresql
+dotnet new we-api -n WeSpace.OrderingService --database postgresql
 ```
 
 ---
@@ -206,7 +206,7 @@ dotnet new my-clean-api -n MyCompany.OrderingService --database postgresql
 
 Navigate to the generated directory:
 ```bash
-cd MyCompany.OrderingService
+cd WeSpace.OrderingService
 ```
 
 Restore dependencies:
@@ -226,7 +226,7 @@ dotnet test
 
 Start the API:
 ```bash
-dotnet run --project src/MyCompany.OrderingService.API
+dotnet run --project src/WeSpace.OrderingService.API
 ```
 
 Once running:
@@ -319,15 +319,15 @@ dotnet tool install --global dotnet-ef
 ### Add a Migration
 ```bash
 dotnet ef migrations add InitialCreate \
-  --project src/MyCompany.OrderingService.Infrastructure \
-  --startup-project src/MyCompany.OrderingService.API
+  --project src/WeSpace.OrderingService.Infrastructure \
+  --startup-project src/WeSpace.OrderingService.API
 ```
 
 ### Apply Migrations to Database
 ```bash
 dotnet ef database update \
-  --project src/MyCompany.OrderingService.Infrastructure \
-  --startup-project src/MyCompany.OrderingService.API
+  --project src/WeSpace.OrderingService.Infrastructure \
+  --startup-project src/WeSpace.OrderingService.API
 ```
 
 ---
@@ -338,7 +338,7 @@ dotnet ef database update \
 Do not store production secrets in `appsettings.json`. For local development, use User Secrets:
 
 ```bash
-cd src/MyCompany.OrderingService.API
+cd src/WeSpace.OrderingService.API
 dotnet user-secrets init
 dotnet user-secrets set "Jwt:SecretKey" "YourStrongSecretKeyAtLeast32CharactersLong!"
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost;Database=MyDb;User Id=sa;Password=YourStrongPassword!;TrustServerCertificate=True"
@@ -351,8 +351,8 @@ All configuration values can be overridden via environment variables:
 ConnectionStrings__DefaultConnection="Server=sql.prod.internal;Database=OrdersDb;User Id=app;Password=ProdPassword;TrustServerCertificate=False"
 Database__Provider="SqlServer"
 Jwt__SecretKey="ProductionSecretKeyAtLeast32CharactersLong!"
-Jwt__Issuer="MyCompany.OrderingService"
-Jwt__Audience="MyCompany.OrderingService.Client"
+Jwt__Issuer="WeSpace.OrderingService"
+Jwt__Audience="WeSpace.OrderingService.Client"
 Cors__AllowedOrigins__0="https://app.mycompany.com"
 ```
 
@@ -364,25 +364,25 @@ To build the entire solution and generate production `.nupkg` packages:
 
 ```bash
 # 1. Clean and restore
-dotnet restore MyCleanApi.slnx
+dotnet restore WeApi.slnx
 
 # 2. Build in Release mode
-dotnet build MyCleanApi.slnx -c Release --no-restore
+dotnet build WeApi.slnx -c Release --no-restore
 
 # 3. Run all tests
-dotnet test MyCleanApi.slnx -c Release --no-build
+dotnet test WeApi.slnx -c Release --no-build
 
 # 4. Pack Template package
-dotnet pack src/MyCleanApi.Template/MyCleanApi.Template.csproj -c Release -o artifacts/
+dotnet pack src/WeApi.Template/WeApi.Template.csproj -c Release -o artifacts/
 
 # 5. Refresh bundled resource in CLI and pack CLI tool
-cp artifacts/MyCleanApi.Template.1.0.0.nupkg src/MyCleanApi.Cli/Resources/
-dotnet pack src/MyCleanApi.Cli/MyCleanApi.Cli.csproj -c Release -o artifacts/
+cp artifacts/WeApi.Template.1.0.0.nupkg src/WeApi.Cli/Resources/
+dotnet pack src/WeApi.Cli/WeApi.Cli.csproj -c Release -o artifacts/
 ```
 
 Generated packages will be in `./artifacts`:
-- `artifacts/MyCleanApi.Template.1.0.0.nupkg`
-- `artifacts/MyCleanApi.Cli.1.0.0.nupkg`
+- `artifacts/WeApi.Template.1.0.0.nupkg`
+- `artifacts/WeApi.Cli.1.0.0.nupkg`
 
 ---
 
@@ -391,11 +391,11 @@ Generated packages will be in `./artifacts`:
 To publish both packages to NuGet:
 
 ```bash
-dotnet nuget push artifacts/MyCleanApi.Template.1.0.0.nupkg \
+dotnet nuget push artifacts/WeApi.Template.1.0.0.nupkg \
   --api-key <YOUR_NUGET_API_KEY> \
   --source https://api.nuget.org/v3/index.json
 
-dotnet nuget push artifacts/MyCleanApi.Cli.1.0.0.nupkg \
+dotnet nuget push artifacts/WeApi.Cli.1.0.0.nupkg \
   --api-key <YOUR_NUGET_API_KEY> \
   --source https://api.nuget.org/v3/index.json
 ```
@@ -406,7 +406,7 @@ dotnet nuget push artifacts/MyCleanApi.Cli.1.0.0.nupkg \
 
 - **Updating the CLI tool**:
   ```bash
-  dotnet tool update --global MyCleanApi.Cli
+  dotnet tool update --global WeApi.Cli
   ```
 - **Updating the `dotnet new` template**:
   ```bash

@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>WeApi.Cli</RootNamespace>
+    
+    <!-- .NET Global Tool Configuration -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>weapi</ToolCommandName>
+    <PackageId>WeApi.Cli</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>WeApi Contributors</Authors>
+    <Company>WeApi</Company>
+    <Product>WeApi CLI</Product>
+    <Description>Production-ready cross-platform CLI tool to generate Clean Architecture .NET 10 Web API backends.</Description>
+    <PackageTags>dotnet-tool;clean-architecture;webapi;dotnet10;cli;scaffold;template</PackageTags>
+    <PackageProjectUrl>https://github.com/weapi/dotnet-clean-api</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/weapi/dotnet-clean-api</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\WeApi.Template.1.0.0.nupkg">
+      <LogicalName>WeApi.Template.nupkg</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

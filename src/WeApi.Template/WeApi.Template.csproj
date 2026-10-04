@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageType>Template</PackageType>
+    <PackageId>WeApi.Template</PackageId>
+    <Title>Clean Architecture .NET 10 Web API Template</Title>
+    <Version>1.0.0</Version>
+    <Authors>WeApi Contributors</Authors>
+    <Company>WeApi</Company>
+    <Product>WeApi</Product>
+    <Description>Production-ready Clean Architecture .NET 10 Web API template with JWT authentication, EF Core (SQL Server / PostgreSQL), FluentValidation, Serilog, and OpenAPI.</Description>
+    <PackageTags>dotnet-new;templates;clean-architecture;webapi;dotnet10;jwt;efcore;csharp;postgresql;sqlserver</PackageTags>
+    <PackageProjectUrl>https://github.com/weapi/dotnet-clean-api</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/weapi/dotnet-clean-api</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net10.0</TargetFramework>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="content\**\*" Exclude="content\**\bin\**;content\**\obj\**" />
+    <Compile Remove="**\*" />
+  </ItemGroup>
+
+</Project>

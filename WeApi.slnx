@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WeApi.Cli/WeApi.Cli.csproj" />
+    <Project Path="src/WeApi.Template/WeApi.Template.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WeApi.Cli.Tests/WeApi.Cli.Tests.csproj" />
+  </Folder>
+</Solution>

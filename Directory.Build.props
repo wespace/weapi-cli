@@ -11,9 +11,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Authors>MyCleanApi Contributors</Authors>
-    <Company>MyCleanApi</Company>
-    <Product>MyCleanApi</Product>
+    <Authors>WeApi Contributors</Authors>
+    <Company>WeApi</Company>
+    <Product>WeApi</Product>
     <Copyright>Copyright © 2026</Copyright>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>

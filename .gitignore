@@ -46,7 +46,7 @@ bld/
 ## NuGet Packages
 *.nupkg
 *.snupkg
-!src/MyCleanApi.Cli/Resources/*.nupkg
+!src/WeApi.Cli/Resources/*.nupkg
 artifacts/
 **/packages/
 !**/packages/build/

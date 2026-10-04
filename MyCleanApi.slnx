@@ -1,9 +1,0 @@
-<Solution>
-  <Folder Name="/src/">
-    <Project Path="src/MyCleanApi.Cli/MyCleanApi.Cli.csproj" />
-    <Project Path="src/MyCleanApi.Template/MyCleanApi.Template.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/MyCleanApi.Cli.Tests/MyCleanApi.Cli.Tests.csproj" />
-  </Folder>
-</Solution>
