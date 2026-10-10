@@ -1,35 +1,65 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+    <!-- Framework-dependent package versions -->
+    <MicrosoftPackageVersion Condition="'$(TargetFramework)' == 'net10.0'">10.0.0</MicrosoftPackageVersion>
+    <MicrosoftPackageVersion Condition="'$(TargetFramework)' == 'net9.0'">9.0.2</MicrosoftPackageVersion>
+    <MicrosoftPackageVersion Condition="'$(TargetFramework)' == 'net8.0'">8.0.13</MicrosoftPackageVersion>
+    <MicrosoftPackageVersion Condition="'$(TargetFramework)' == 'net7.0'">7.0.20</MicrosoftPackageVersion>
+    <MicrosoftPackageVersion Condition="'$(TargetFramework)' == 'net6.0'">6.0.36</MicrosoftPackageVersion>
+    <MicrosoftPackageVersion Condition="'$(MicrosoftPackageVersion)' == ''">10.0.0</MicrosoftPackageVersion>
+
+    <OpenApiPackageVersion Condition="'$(TargetFramework)' == 'net10.0'">10.0.12</OpenApiPackageVersion>
+    <OpenApiPackageVersion Condition="'$(TargetFramework)' == 'net9.0'">9.0.2</OpenApiPackageVersion>
+    <OpenApiPackageVersion Condition="'$(TargetFramework)' == 'net8.0'">8.0.13</OpenApiPackageVersion>
+    <OpenApiPackageVersion Condition="'$(TargetFramework)' == 'net7.0'">7.0.20</OpenApiPackageVersion>
+    <OpenApiPackageVersion Condition="'$(TargetFramework)' == 'net6.0'">6.0.36</OpenApiPackageVersion>
+    <OpenApiPackageVersion Condition="'$(OpenApiPackageVersion)' == ''">10.0.12</OpenApiPackageVersion>
+
+    <NpgsqlPackageVersion Condition="'$(TargetFramework)' == 'net10.0'">10.0.0</NpgsqlPackageVersion>
+    <NpgsqlPackageVersion Condition="'$(TargetFramework)' == 'net9.0'">9.0.3</NpgsqlPackageVersion>
+    <NpgsqlPackageVersion Condition="'$(TargetFramework)' == 'net8.0'">8.0.11</NpgsqlPackageVersion>
+    <NpgsqlPackageVersion Condition="'$(TargetFramework)' == 'net7.0'">7.0.18</NpgsqlPackageVersion>
+    <NpgsqlPackageVersion Condition="'$(TargetFramework)' == 'net6.0'">6.0.29</NpgsqlPackageVersion>
+    <NpgsqlPackageVersion Condition="'$(NpgsqlPackageVersion)' == ''">10.0.0</NpgsqlPackageVersion>
+
+    <SerilogPackageVersion Condition="'$(TargetFramework)' == 'net6.0'">6.1.0</SerilogPackageVersion>
+    <SerilogPackageVersion Condition="'$(TargetFramework)' == 'net7.0'">7.0.0</SerilogPackageVersion>
+    <SerilogPackageVersion Condition="'$(TargetFramework)' == 'net8.0'">8.0.3</SerilogPackageVersion>
+    <SerilogPackageVersion Condition="'$(SerilogPackageVersion)' == ''">9.0.0</SerilogPackageVersion>
+
+    <SwashbucklePackageVersion Condition="'$(TargetFramework)' == 'net6.0' Or '$(TargetFramework)' == 'net7.0'">6.6.2</SwashbucklePackageVersion>
+    <SwashbucklePackageVersion Condition="'$(SwashbucklePackageVersion)' == ''">7.2.0</SwashbucklePackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- ASP.NET Core & OpenAPI -->
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(OpenApiPackageVersion)" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="$(SwashbucklePackageVersion)" />
 
     <!-- Authentication & Security -->
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(MicrosoftPackageVersion)" />
 
     <!-- Entity Framework Core -->
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(MicrosoftPackageVersion)" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="$(NpgsqlPackageVersion)" />
 
     <!-- Diagnostics & Health Checks -->
-    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="$(MicrosoftPackageVersion)" />
 
     <!-- Logging -->
-    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="$(SerilogPackageVersion)" />
 
     <!-- Validation -->
     <PackageVersion Include="FluentValidation" Version="11.11.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
 
     <!-- Testing -->
-    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(MicrosoftPackageVersion)" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />

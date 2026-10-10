@@ -24,54 +24,71 @@ public static class TemplateManager
         }
 
         // Extract embedded template package
-        var tempDirectory = Path.Combine(Path.GetTempPath(), "weapi-template");
+        var tempDirectory = Path.Combine(Path.GetTempPath(), $"weapi-template-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempDirectory);
         var tempPackagePath = Path.Combine(tempDirectory, "WeApi.Template.nupkg");
 
-        var assembly = Assembly.GetExecutingAssembly();
-        await using (var resourceStream = assembly.GetManifestResourceStream(ResourceName))
+        try
         {
-            if (resourceStream is null)
+            var assembly = Assembly.GetExecutingAssembly();
+            await using (var resourceStream = assembly.GetManifestResourceStream(ResourceName))
             {
-                // Fallback: search in adjacent directories if running from development build
-                var resourcesDir = Path.Combine(AppContext.BaseDirectory, "Resources");
-                var devPath = Directory.Exists(resourcesDir)
-                    ? Directory.GetFiles(resourcesDir, "WeApi.Template*.nupkg").FirstOrDefault()
-                    : null;
-
-                if (devPath is not null && File.Exists(devPath))
+                if (resourceStream is null)
                 {
-                    File.Copy(devPath, tempPackagePath, overwrite: true);
+                    // Fallback: search in adjacent directories if running from development build
+                    var resourcesDir = Path.Combine(AppContext.BaseDirectory, "Resources");
+                    var devPath = Directory.Exists(resourcesDir)
+                        ? Directory.GetFiles(resourcesDir, "WeApi.Template*.nupkg").FirstOrDefault()
+                        : null;
+
+                    if (devPath is not null && File.Exists(devPath))
+                    {
+                        File.Copy(devPath, tempPackagePath, overwrite: true);
+                    }
+                    else
+                    {
+                        ConsoleUi.WriteError($"Embedded template package '{ResourceName}' was not found in CLI assembly.");
+                        return false;
+                    }
                 }
                 else
                 {
-                    ConsoleUi.WriteError($"Embedded template package '{ResourceName}' was not found in CLI assembly.");
-                    return false;
+                    await using var fileStream = File.Create(tempPackagePath);
+                    await resourceStream.CopyToAsync(fileStream, cancellationToken);
                 }
             }
-            else
+
+            // Ensure no conflicting duplicate package paths exist before installing
+            await ProcessRunner.RunAsync("dotnet", "new uninstall WeApi.Template", null, cancellationToken);
+
+            // Install into dotnet new
+            var installResult = await ProcessRunner.RunAsync(
+                "dotnet",
+                $"new install \"{tempPackagePath}\" --force",
+                null,
+                cancellationToken);
+
+            if (!installResult.Success)
             {
-                await using var fileStream = File.Create(tempPackagePath);
-                await resourceStream.CopyToAsync(fileStream, cancellationToken);
+                ConsoleUi.WriteError($"Failed to install template package: {installResult.StandardError}");
+                return false;
+            }
+
+            return true;
+        }
+        finally
+        {
+            if (Directory.Exists(tempDirectory))
+            {
+                try
+                {
+                    Directory.Delete(tempDirectory, recursive: true);
+                }
+                catch
+                {
+
+                }
             }
         }
-
-        // Ensure no conflicting duplicate package paths exist before installing
-        await ProcessRunner.RunAsync("dotnet", "new uninstall WeApi.Template", null, cancellationToken);
-
-        // Install into dotnet new
-        var installResult = await ProcessRunner.RunAsync(
-            "dotnet",
-            $"new install \"{tempPackagePath}\" --force",
-            null,
-            cancellationToken);
-
-        if (!installResult.Success)
-        {
-            ConsoleUi.WriteError($"Failed to install template package: {installResult.StandardError}");
-            return false;
-        }
-
-        return true;
     }
 }

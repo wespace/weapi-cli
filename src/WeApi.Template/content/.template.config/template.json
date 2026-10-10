@@ -47,6 +47,63 @@
       "defaultValue": "guid",
       "description": "The primary key identifier type to use for domain entities."
     },
+    "framework": {
+      "type": "parameter",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "net10.0",
+          "description": ".NET 10.0 (Latest)"
+        },
+        {
+          "choice": "net9.0",
+          "description": ".NET 9.0"
+        },
+        {
+          "choice": "net8.0",
+          "description": ".NET 8.0 (LTS)"
+        },
+        {
+          "choice": "net7.0",
+          "description": ".NET 7.0 (STS)"
+        },
+        {
+          "choice": "net6.0",
+          "description": ".NET 6.0 (LTS)"
+        }
+      ],
+      "defaultValue": "net10.0",
+      "description": "The target .NET framework version for the solution."
+    },
+    "frameworkReplacement": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "<TargetFramework>net10.0</TargetFramework>",
+      "parameters": {
+        "cases": [
+          {
+            "condition": "(framework == \"net6.0\")",
+            "value": "<TargetFramework>net6.0</TargetFramework>"
+          },
+          {
+            "condition": "(framework == \"net7.0\")",
+            "value": "<TargetFramework>net7.0</TargetFramework>"
+          },
+          {
+            "condition": "(framework == \"net8.0\")",
+            "value": "<TargetFramework>net8.0</TargetFramework>"
+          },
+          {
+            "condition": "(framework == \"net9.0\")",
+            "value": "<TargetFramework>net9.0</TargetFramework>"
+          },
+          {
+            "condition": "(framework == \"net10.0\")",
+            "value": "<TargetFramework>net10.0</TargetFramework>"
+          }
+        ]
+      }
+    },
     "useIntId": {
       "type": "computed",
       "value": "(idType == \"int\")"
