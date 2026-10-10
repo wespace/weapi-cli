@@ -1,8 +1,8 @@
+using Serilog;
 using WeSpace.Api.API.Extensions;
 using WeSpace.Api.API.Middleware;
 using WeSpace.Api.Application;
 using WeSpace.Api.Infrastructure;
-using Serilog;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -23,16 +23,10 @@ try
                 outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}");
     });
 
-    // 2. Application & Infrastructure Layers
+    // 2. Application, Infrastructure & API Services
     builder.Services.AddApplication();
     builder.Services.AddInfrastructure(builder.Configuration);
-
-    // 3. API Services
-    builder.Services.AddControllers();
-    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-    builder.Services.AddProblemDetails();
-    builder.Services.AddSwaggerDocumentation();
-    builder.Services.AddCustomCors(builder.Configuration);
+    builder.Services.AddApiServices(builder.Configuration);
 
     var app = builder.Build();
 

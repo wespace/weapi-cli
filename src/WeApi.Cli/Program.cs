@@ -20,8 +20,9 @@ public class Program
             return primaryCommand switch
             {
                 "new" => await NewCommand.ExecuteAsync(args[1..]),
-                "--version" or "-v" or "version" => ShowVersion(),
-                "--help" or "-h" or "help" or "-?" => ShowHelp(),
+                "upgrade" => await UpgradeCommand.ExecuteAsync(args[1..]),
+                "--version" or "-v" or "version" or "/version" or "/v" => ShowVersion(),
+                "--help" or "-h" or "help" or "-?" or "/help" or "/h" or "/?" => ShowHelp(),
                 _ => HandleUnknownCommand(primaryCommand)
             };
         }

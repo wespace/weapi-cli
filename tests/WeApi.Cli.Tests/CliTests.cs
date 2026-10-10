@@ -16,10 +16,52 @@ public class CliTests
     }
 
     [Fact]
-    public async Task Main_WithVersionFlag_ShouldReturnZero()
+    public async Task Main_NewWithHelpFlag_ShouldReturnZero()
     {
         // Act
-        var exitCode = await Program.Main(["--version"]);
+        var exitCode = await Program.Main(["new", "--help"]);
+
+        // Assert
+        Assert.Equal(0, exitCode);
+    }
+
+    [Fact]
+    public async Task Main_UpgradeWithHelpFlag_ShouldReturnZero()
+    {
+        // Act
+        var exitCode = await Program.Main(["upgrade", "--help"]);
+
+        // Assert
+        Assert.Equal(0, exitCode);
+    }
+
+    [Theory]
+    [InlineData("--help")]
+    [InlineData("-h")]
+    [InlineData("-?")]
+    [InlineData("help")]
+    [InlineData("/help")]
+    [InlineData("/h")]
+    [InlineData("/?")]
+    public async Task Main_WithHelpFlags_ShouldReturnZero(string flag)
+    {
+        // Act
+        var exitCode = await Program.Main([flag]);
+
+        // Assert
+        Assert.Equal(0, exitCode);
+    }
+
+    [Theory]
+    [InlineData("--version")]
+    [InlineData("-v")]
+    [InlineData("version")]
+    [InlineData("/version")]
+    [InlineData("/v")]
+    public async Task Main_WithVersionFlags_ShouldReturnZero(string flag)
+    {
+        // Act
+        var exitCode = await Program.Main([flag]);
 
         // Assert
         Assert.Equal(0, exitCode);

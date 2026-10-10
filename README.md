@@ -22,6 +22,7 @@ Distributed as both a **.NET Global Tool (`WeApi.Cli`)** and an official **`dotn
 - **Comprehensive Automated Testing**: Complete xUnit test suites covering Unit Tests and `WebApplicationFactory` Integration Tests using an isolated In-Memory database.
 - **Central Package Management (CPM)**: Centralized package version management with `Directory.Packages.props` and `Directory.Build.props`.
 - **True Cross-Platform CLI**: Compatible with macOS, Linux, and Windows with zero OS-specific shell assumptions.
+- **Automated Framework Migration (`weapi upgrade`)**: Effortlessly upgrade or downgrade target .NET frameworks (.NET 6 through 10) with complexity guards, unified diff preview, and automated rollback safety.
 
 ---
 
@@ -42,9 +43,9 @@ init-templates/
 │
 ├── src/
 │   ├── WeApi.Cli/            # Cross-platform CLI Global Tool
-│   │   ├── Commands/              # New, Help, Version commands
-│   │   ├── Common/                # Console UI, Process runner
-│   │   ├── Services/              # Project generator & template installer
+│   │   ├── Commands/              # New, Upgrade, Help, Version commands
+│   │   ├── Common/                # Console UI, Process runner, Git helper
+│   │   ├── Services/              # Project generator, migration analyzer & SDK tools
 │   │   ├── Resources/             # Bundled template nupkg
 │   │   └── Program.cs
 │   │
@@ -200,6 +201,7 @@ weapi new WeSpace.OrderingService -o ./services/ordering-service --database post
 
 | Flag | Short | Description | Values | Default |
 |------|-------|-------------|--------|---------|
+| `--framework` | `-f` | Target .NET framework | `net10.0`, `net9.0`, `net8.0`, `net7.0`, `net6.0` (or `10`-`6`) | `net10.0` |
 | `--database` | `-d` | Relational database provider | `sqlserver`, `postgresql` | `sqlserver` |
 | `--id-type` | `-i`, `--id` | Entity primary key identifier type | `guid`, `int`, `long` | `guid` |
 | `--output` | `-o` | Output directory | Directory path | `./<ProjectName>` |
@@ -217,6 +219,64 @@ dotnet new we-api -n WeSpace.OrderingService --database postgresql --idType int
 # SQL Server with 64-bit long (bigint) IDs
 dotnet new we-api -n WeSpace.OrderingService --database sqlserver --idType long
 ```
+
+---
+
+## Upgrading & Migrating Projects (`weapi upgrade`)
+
+The `weapi upgrade` command provides an automated, safety-first migration engine to upgrade or downgrade the target .NET framework of an existing project or solution (supporting .NET 6, 7, 8 LTS, 9, and 10).
+
+### Key Capabilities
+- **Single Source of Truth Migration**: For WeApi solutions using `Directory.Build.props`, the framework is updated centrally in one place with automatic alignment of dynamic package versions.
+- **Multi-Project SDK Solutions**: Automatically updates `TargetFramework` across `.csproj` files and aligns whitelisted Microsoft and EF Core package dependencies.
+- **Complexity Guards & Preflight Analysis**: Rejects unsupported configurations (legacy non-SDK projects, multi-targeting with `<TargetFrameworks>`, custom OS-specific TFMs like `net8.0-windows`, or conflicting project structures) with clear, actionable diagnostics before any file is touched.
+- **Git Working Tree Safety**: Detects uncommitted Git changes and prompts for confirmation to prevent accidental loss of work.
+- **Atomic Rollback**: Tracks all modified files in memory. If post-migration build or restore fails, files are automatically reverted to their previous state.
+- **SDK Resolution & Auto-Install**: Evaluates currently installed SDKs and can automatically download and install missing .NET SDKs using official Microsoft install scripts.
+- **Global.json Alignment**: Optionally updates pinned SDK versions in `global.json` via `--update-global-json`.
+
+### Usage & Examples
+
+#### 1. Upgrade Current Solution to .NET 10
+```bash
+weapi upgrade -f net10.0
+# Or using short-form version:
+weapi upgrade -f 10
+```
+
+#### 2. Downgrade to .NET 8 LTS with Dry-Run & Diff Preview
+Simulate migration without modifying any files, and inspect the unified diff:
+```bash
+weapi upgrade -f net8.0 --dry-run --diff
+```
+
+#### 3. Upgrade Project in a Specific Folder
+```bash
+weapi upgrade ./services/inventory-api -f net10.0
+```
+
+#### 4. Automated Migration with Automatic SDK Installation
+Automatically download and install the required .NET SDK if missing, bypassing interactive prompts:
+```bash
+weapi upgrade -f net10.0 --yes --install-sdk
+```
+
+#### 5. Update `global.json` SDK Version
+```bash
+weapi upgrade -f net10.0 --update-global-json
+```
+
+### Upgrade Command Options & Flags
+
+| Flag | Short | Description | Values / Notes |
+|------|-------|-------------|----------------|
+| `--framework` | `-f`, `--dotnet-version` | Target framework to migrate to (**required**) | `net6.0`, `net7.0`, `net8.0`, `net9.0`, `net10.0` (or `6`, `7`, `8`, `9`, `10`) |
+| `--path` | `-p` | Path to project or solution directory | Directory path (default: current directory) |
+| `--dry-run` | | Simulate migration analysis without modifying files | Safe preview mode |
+| `--diff` | | Display unified diff preview of file changes | Works with or without `--dry-run` |
+| `--yes`, `--force` | `-y` | Bypass interactive confirmation prompts | Useful for CI/CD or scripted migrations |
+| `--install-sdk` | | Automatically download and install missing .NET SDK | Uses official Microsoft install scripts |
+| `--update-global-json` | | Update `global.json` SDK version to an installed compatible SDK | Safe alignment with installed SDKs |
 
 ---
 

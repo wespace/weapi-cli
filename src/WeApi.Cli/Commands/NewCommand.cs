@@ -11,13 +11,22 @@ public static class NewCommand
         string? outputDirectory = null;
         string database = "sqlserver";
         string idType = "guid";
+        string framework = "net10.0";
         bool dryRun = false;
 
         for (int i = 0; i < args.Length; i++)
         {
             var arg = args[i];
 
-            if (arg.Equals("--database", StringComparison.OrdinalIgnoreCase) || arg.Equals("-d", StringComparison.OrdinalIgnoreCase))
+            if (arg.Equals("--help", StringComparison.OrdinalIgnoreCase) ||
+                arg.Equals("-h", StringComparison.OrdinalIgnoreCase) ||
+                arg.Equals("-?", StringComparison.OrdinalIgnoreCase) ||
+                arg.Equals("help", StringComparison.OrdinalIgnoreCase))
+            {
+                HelpCommand.Execute();
+                return 0;
+            }
+            else if (arg.Equals("--database", StringComparison.OrdinalIgnoreCase) || arg.Equals("-d", StringComparison.OrdinalIgnoreCase))
             {
                 if (i + 1 < args.Length)
                 {
@@ -53,6 +62,18 @@ public static class NewCommand
                     return 1;
                 }
             }
+            else if (arg.Equals("--framework", StringComparison.OrdinalIgnoreCase) || arg.Equals("-f", StringComparison.OrdinalIgnoreCase) || arg.Equals("--dotnet-version", StringComparison.OrdinalIgnoreCase))
+            {
+                if (i + 1 < args.Length)
+                {
+                    framework = args[++i];
+                }
+                else
+                {
+                    ConsoleUi.WriteError("Missing value for option --framework. Allowed values: net6.0, net7.0, net8.0, net9.0, net10.0 (or 6, 7, 8, 9, 10)");
+                    return 1;
+                }
+            }
             else if (arg.Equals("--dry-run", StringComparison.OrdinalIgnoreCase))
             {
                 dryRun = true;
@@ -84,6 +105,7 @@ public static class NewCommand
             OutputDirectory: outputDirectory,
             Database: database,
             IdType: idType,
+            Framework: framework,
             DryRun: dryRun);
 
         return await ProjectGenerator.GenerateAsync(options, cancellationToken);

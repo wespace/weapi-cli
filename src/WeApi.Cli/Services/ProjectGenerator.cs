@@ -1,5 +1,7 @@
+using System.Collections.Frozen;
 using System.Text.RegularExpressions;
 using WeApi.Cli.Common;
+using static WeApi.Cli.Common.FrameworkNormalizer;
 
 namespace WeApi.Cli.Services;
 
@@ -8,6 +10,7 @@ public record ProjectGenerationOptions(
     string? OutputDirectory,
     string Database = "sqlserver",
     string IdType = "guid",
+    string Framework = "net10.0",
     bool DryRun = false);
 
 public static class ProjectGenerator
@@ -16,18 +19,18 @@ public static class ProjectGenerator
         @"^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$",
         RegexOptions.Compiled);
 
-    private static readonly HashSet<string> SupportedDatabases = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly FrozenSet<string> SupportedDatabases = new[]
     {
         "sqlserver",
         "postgresql"
-    };
+    }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
-    private static readonly HashSet<string> SupportedIdTypes = new(StringComparer.OrdinalIgnoreCase)
+    private static readonly FrozenSet<string> SupportedIdTypes = new[]
     {
         "guid",
         "int",
         "long"
-    };
+    }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
     public static async Task<int> GenerateAsync(
         ProjectGenerationOptions options,
@@ -65,12 +68,20 @@ public static class ProjectGenerator
             return 1;
         }
 
-        // 4. Resolve target directory
+        // 4. Validate framework option
+        if (!FrameworkNormalizer.TryNormalize(options.Framework, out var framework))
+        {
+            ConsoleUi.WriteError(
+                $"Unsupported target framework '{options.Framework}'. Supported options are: {string.Join(", ", FrameworkNormalizer.GetSupportedFrameworks())}.");
+            return 1;
+        }
+
+        // 5. Resolve target directory
         var targetDirectory = string.IsNullOrWhiteSpace(options.OutputDirectory)
             ? Path.Combine(Directory.GetCurrentDirectory(), options.ProjectName)
             : Path.GetFullPath(options.OutputDirectory);
 
-        // 5. Validate target directory is empty if exists
+        // 6. Validate target directory is empty if exists
         if (Directory.Exists(targetDirectory) && Directory.EnumerateFileSystemEntries(targetDirectory).Any())
         {
             ConsoleUi.WriteError(
@@ -80,23 +91,23 @@ public static class ProjectGenerator
 
         if (options.DryRun)
         {
-            ConsoleUi.WriteInfo($"[Dry Run] Would generate '{options.ProjectName}' in '{targetDirectory}' with '{database}' database and '{idType}' primary key ID type.");
+            ConsoleUi.WriteInfo($"[Dry Run] Would generate '{options.ProjectName}' in '{targetDirectory}' with '{database}' database, '{idType}' primary key ID type, and '{framework}' framework.");
             return 0;
         }
 
         ConsoleUi.WriteBanner();
-        ConsoleUi.WriteInfo($"Creating {options.ProjectName}...");
+        ConsoleUi.WriteInfo($"Creating {options.ProjectName} ({framework})...");
         Console.WriteLine();
 
-        // 6. Ensure template is installed
+        // 7. Ensure template is installed
         var templateInstalled = await TemplateManager.EnsureTemplateInstalledAsync(force: false, cancellationToken);
         if (!templateInstalled)
         {
             return 1;
         }
 
-        // 7. Invoke dotnet new
-        var arguments = $"new we-api -n \"{options.ProjectName}\" -o \"{targetDirectory}\" --database {database} --idType {idType}";
+        // 8. Invoke dotnet new
+        var arguments = $"new we-api -n \"{options.ProjectName}\" -o \"{targetDirectory}\" --database {database} --idType {idType} --framework {framework}";
         var result = await ProcessRunner.RunAsync("dotnet", arguments, null, cancellationToken);
 
         if (!result.Success)
@@ -105,7 +116,7 @@ public static class ProjectGenerator
             return 1;
         }
 
-        // 8. Report success with clear visual steps
+        // 9. Report success with clear visual steps
         ConsoleUi.WriteStep("Solution created");
         ConsoleUi.WriteStep("API project created");
         ConsoleUi.WriteStep("Application project created");
@@ -116,6 +127,7 @@ public static class ProjectGenerator
         ConsoleUi.WriteStep("JWT authentication configured");
         ConsoleUi.WriteStep($"Database configured ({database.ToUpperInvariant()})");
         ConsoleUi.WriteStep($"Entity ID type configured ({idType.ToUpperInvariant()})");
+        ConsoleUi.WriteStep($"Target framework configured ({framework})");
         ConsoleUi.WriteStep("Swagger OpenAPI configured");
 
         ConsoleUi.WriteSuccess("Project created successfully.");

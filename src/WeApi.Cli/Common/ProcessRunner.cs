@@ -56,15 +56,42 @@ public static class ProcessRunner
             }
         };
 
-        process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
+        try
+        {
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
 
-        await process.WaitForExitAsync(cancellationToken);
+            await process.WaitForExitAsync(cancellationToken);
+            process.WaitForExit();
 
-        return new ProcessResult(
-            process.ExitCode,
-            outputBuilder.ToString().Trim(),
-            errorBuilder.ToString().Trim());
+            return new ProcessResult(
+                process.ExitCode,
+                outputBuilder.ToString().Trim(),
+                errorBuilder.ToString().Trim());
+        }
+        catch (OperationCanceledException)
+        {
+            try
+            {
+                if (!process.HasExited)
+                {
+                    process.Kill(entireProcessTree: true);
+                }
+            }
+            catch
+            {
+
+            }
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            return new ProcessResult(
+                -1,
+                outputBuilder.ToString().Trim(),
+                ex.Message);
+        }
     }
 }
